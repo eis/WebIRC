@@ -5,12 +5,17 @@ var app = require('express').createServer(),
 
 require('jade');
 
-var opts = {server: "irc.quakenet.org",
-						channels: ["#teamliquid", "#tlpickup"],
-					  nick: "SimonR",
-						maxMsgs: 1000};
+var settings = require('./settings');
+
+var opts = {
+	server: settings.IRC_SERVER,
+	channels: settings.IRC_CHANNELS,
+	nick: settings.IRC_NICK,
+	maxMsgs: 1000
+};
+
 var ircMessages = [];
-var webClients = []; 
+var webClients = [];
 var server = new irc({ server: opts.server, nick: opts.nick });
 
 server.connect(function() {

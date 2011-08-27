@@ -1,6 +1,6 @@
 var app = require('express').createServer(),
-		irc = require('./lib/IRC-js/lib/irc'),
-		io = require('./lib/Socket.IO-node'),
+		irc = require('IRC-js'),
+		io = require('Socket.IO'),
 		socket = io.listen(app);
 
 require('jade');
@@ -73,3 +73,5 @@ app.get('/', function(req, res){
 app.get('/*.*', function(req, res){res.sendfile("./static"+req.url);});
 
 app.listen(3000);
+
+console.log("Listening at 3000");

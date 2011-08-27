@@ -33,7 +33,7 @@ server.addListener('privmsg', function(msg) {
 
 	var data = {channel: chan, from:nick, msg:message};
 
-	console.log("IRC: "+msg.params[0]+" - "+msg.person.nick+":"+msg.params[1]+"\n");
+	console.log("IRC: " + msg.params[0] + " - " + msg.person.nick + ":" + msg.params[1]+"\n");
 
 	for(i in opts.channels) {
 		if(chan == opts.channels[i]) {
@@ -47,17 +47,17 @@ server.addListener('privmsg', function(msg) {
 		}
 	}
 
-	if(ircMessages.length >= opts.maxMsgs) 
+	if(ircMessages.length >= opts.maxMsgs)
 		ircMessages = ircMessages.splice(0,1);
 });
 
-socket.on('connection', function(client){
+socket.on('connection', function(client) {
 	webClients.push({session:client.sessionId,client:client});
-	console.log("got a client :: "+client.sessionId+" :: "+webClients.length);
+	console.log("got a client :: " + client.sessionId + " :: "+webClients.length);
 
 	client.send({msgs:ircMessages,channels: opts.channels});
 
-	client.on('disconnect', function(){ 
+	client.on('disconnect', function() {
 		for(i in webClients) {
 			if(webClients[i].session == client.sessionId)
 				webClients.splice(i,1);
@@ -71,11 +71,13 @@ app.set('view options', {
 	    layout: false
 });
 
-app.get('/', function(req, res){
-	res.render('index');	
+app.get('/', function(req, res) {
+	res.render('index');
 });
 
-app.get('/*.*', function(req, res){res.sendfile("./static"+req.url);});
+app.get('/*.*', function(req, res) {
+	res.sendfile("./static" + req.url);
+});
 
 app.listen(3000);
 

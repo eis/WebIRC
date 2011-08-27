@@ -1,11 +1,11 @@
 body {
-	padding: 15px 15px 15px 15px;
+	padding: 0;
 	margin: 0;
 	font-family: Verdana,Arial,sans-serif;
 }
 
-#topcontainer, #bottomcontainer {
-	padding: 15px;
+#container {
+	padding: 15px 15px 15px 15px;
 }
 
 #tabs {
@@ -22,15 +22,4 @@ body {
 	overflow: auto;
 	overflow-x:hidden;
 	font-size: 1em;
-}
-#inputbox {
-	width: 700px;
-	display: none;
-}
-#tabs {
-	display: none;
-}
-#msgbox {
-	font-weight: bold;
-	margin-bottom: 1em;
 }

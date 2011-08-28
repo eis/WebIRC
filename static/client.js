@@ -77,11 +77,13 @@ function doPage()
 
 $(document).ready(function() {
 	if("WebSocket" in window) {
-		$.getScript('/socket.io/socket.io.js', function() {
-			doPage();
-		});
+		if (window.loggedIn === true) {
+			$.getScript('/socket.io/socket.io.js', function() {
+				doPage();
+			});
+		 }
 	} else {
-		window.location = "error.html";	
+		window.location = "error.html";
 	}
-	
+
 });

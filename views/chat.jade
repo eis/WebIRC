@@ -1,0 +1,15 @@
+!!! 5
+html(lang="en")
+	head
+		title WebIRC - #{nick}
+		<link rel="stylesheet" type="text/css" href="/style.css">
+		<link rel="stylesheet" type="text/css" href="/jquery-ui.css">
+		script(type='text/javascript', src='/jquery.js')
+		script(type='text/javascript', src='/jquery-ui.js')
+		script(type='text/javascript', src='/client.js')
+		script(type='text/javascript')
+			var loggedIn = true;
+			var nickName = '#{nick}';
+
+	body
+		#channels

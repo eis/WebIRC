@@ -76,6 +76,16 @@ app.get('/', function(req, res) {
 	res.render('index');
 });
 
+app.post('/irc', function(req, res){
+
+	res.render('chat', {
+	     locals: {
+		 	nick: opts.nick
+	     }
+	  });
+
+});
+
 app.get('/*.*', function(req, res) {
 	res.sendfile("./static" + req.url);
 });

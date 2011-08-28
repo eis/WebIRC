@@ -52,7 +52,7 @@ function createChannels(list)
 
 	str += '</div>';
 
-	$('body').append(str);
+	$('#channels').append(str);
 
 	$('#tabs').tabs({selected: 0, show: function() {
 		for(i in channelList) 
@@ -65,11 +65,14 @@ function doPage()
 	socket = io.connect();
 	
 	socket.on('message', function(msg) {
+		mylog('we got a message');
 		if(msg.channels != null) {
+			mylog('with channels');
 			channelList = msg.channels;				
 			createChannels(msg.channels);
 			updateAll(msg.msgs);
 		} else {
+			mylog('with msg');
 			update(msg);
 		}
 	});

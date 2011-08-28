@@ -4,8 +4,14 @@ var app = express.createServer(),
 
 require('jade');
 
+var WebIRCController = require('./webirccontroller.class');
 var settings = require('./settings');
-var IRCServerConnection = require('./ircserverconnection.class');
+
+var WebIRC = new WebIRCController(io);
+
+function debug(msg) { console.log(msg); };
+
+WebIRC.onDebugMessage(debug);
 
 // up the log level to not show heartbeat messages
 io.set('log level', 2);
@@ -17,73 +23,12 @@ app.configure(function() {
 	app.use(express.bodyParser());
 
 	// to know which client belongs to which irc connection, we use sessions
-	// cookieparser must be deined before session as per 
+	// cookieparser must be defined before session as per 
 	// http://senchalabs.github.com/connect/middleware-session.html
 	app.use(express.cookieParser());
 	app.use(express.session({ secret: "some value" }));
 	
-	console.log("Socket: configured and ready");
-});
-
-var opts = {
-	server: settings.IRC_SERVER,
-	channels: settings.IRC_CHANNELS,
-	maxMsgs: 1000
-};
-
-var MyWebIRC = {};
-MyWebIRC.ircMessages = [];
-MyWebIRC.webClients = {};
-
-function messageHandler(data) {
-
-	for (i in opts.channels) {
-		if (chan == opts.channels[i]) {
-			MyWebIRC.ircMessages.push(data);
-			
-			console.log("Got a message from irc with " + data.clientId);
-
-			if (MyWebIRC.webClients[data.clientId]) {
-				MyWebIRC.webClients[data.clientId].json.send(data);
-				console.log("Data sent to " + data.clientId);
-			} else {
-				console.log("WARN: could not find client connection with id "
-						+ data.clientId + " from " + MyWebIRC.webClients.length + " clients");
-			}
-		}
-	}
-
-	if (MyWebIRC.ircMessages.length >= opts.maxMsgs) {
-		MyWebIRC.ircMessages = MyWebIRC.ircMessages.splice(0,1);
-	}
-};
-
-
-function debugMessageHandler(msg) {
-	console.log(msg);
-}
-
-io.sockets.on('connection', function(client) {
-	
-	client.emit('please identify');
-	console.log('Got a client connection, requesting identify');
-	
-	client.on('identify request', function(data) {
-		// client.sessionId undefined at this point so cannot be the key
-		MyWebIRC.webClients[data.id] = client;
-		console.log("got a client identify request :: " + data.id + " :: " + data.nick);
-	
-		client.json.send({msgs:MyWebIRC.ircMessages,channels: opts.channels});
-	});
-
-	client.on('disconnect', function() {
-		for(i in MyWebIRC.webClients) {
-			if(MyWebIRC.webClients[i].session == client.sessionId) {
-				MyWebIRC.webClients.splice(i,1);
-			}
-		}
-		console.log("disconnect");
-	});
+	debug("Socket: configured and ready");
 });
 
 app.set('view engine', 'jade');
@@ -97,29 +42,29 @@ app.get('/', function(req, res) {
 
 app.post('/irc', function(req, res){
 
+	if (!req.session || !req.session.id) {
+		res.render('index');
+		return;
+	}
+	
 	var hasLoginInfo = (req.body.user !== undefined);
+	var sessionIdString = req.session.id;
+	var nickName = undefined;
 
 	if (hasLoginInfo) {
-		var nickName = req.body.user.name;
-		var serverConnection = new IRCServerConnection(settings.IRC_SERVER, nickName, settings.IRC_CHANNELS);
-		serverConnection.onMessage(messageHandler);
-		serverConnection.onDebugMessage(debugMessageHandler);
-		serverConnection.setClientConnectionId(req.session.id);
-		console.log("Setting client connection id to " + req.session.id);
-		res.render('chat', {
-		     locals: {
-			 	nick: nickName,
-			 	sessionId: req.session.id
-		     }
-		  });
+		nickName = req.body.user.name;
+		WebIRC.newConnection(nickName, sessionIdString);
+		debug("Setting client connection id to " + sessionIdString);
 	} else {
-
-		res.render('chat', {
-		     locals: {
-			 	nick: '???'
-		     }
-		  });
+		nickName = WebIRC.resolveNickForSession(sessionIdString);
 	}
+	
+	res.render('chat', {
+	     locals: {
+		 	nick: nickName,
+		 	sessionId: sessionIdString
+	     }
+	  });
 });
 
 app.get('/*.*', function(req, res) {

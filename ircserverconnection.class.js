@@ -42,7 +42,7 @@ function IRCServerConnection (serverParam, nickParam, channelsParam) {
 
     	var data = {channel: chan, from:nick, msg:message, clientId: internal.clientConnectionId};
 
-    	debugMessage("IRC: " + msg.params[0] + " - " + msg.person.nick + ":" + msg.params[1]);
+    	debugMessage("IRC: " + data.channel + " - " + data.from+ ":" + data.msg + ":" + data.clientId);
 
     	receiveMessage(data);
 

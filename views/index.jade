@@ -12,6 +12,10 @@ html(lang="en")
 			h1 WebIRC
 		form(method="post", action="irc")
 			fieldset
+				label User name:
+				input(type="text", name="user[name]")
+				label Password:
+				input(type="password", name="user[pass]")
 				input(type="submit", value="Login!")
 
 		p#msgbox

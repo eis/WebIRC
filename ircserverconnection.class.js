@@ -1,16 +1,16 @@
 var irc = require('IRC-js');
 
 /**
- * IRCServer class.
+ * IRCServerConnection class.
  * Object-oriented javascript done in the manner described in http://javascript.crockford.com/private.html
  * See also Node.js events at http://venodesigns.net/2011/04/16/emitting-custom-events-in-node-js/
  * 
  * @param serverParam
  * @param nickParam
  * @param channelsParam
- * @returns {IRCServer}
+ * @returns {IRCServerConnection}
  */
-function IRCServer (serverParam, nickParam, channelsParam) {
+function IRCServerConnection (serverParam, nickParam, channelsParam) {
 
 	if (!serverParam || !nickParam || !channelsParam) {
 		throw new Error("Constructor parameters must not be empty"); 
@@ -70,4 +70,4 @@ function IRCServer (serverParam, nickParam, channelsParam) {
     	internal.DebugMessageHandler = handlerFunc;
     };
 }
-module.exports = IRCServer;
+module.exports = IRCServerConnection;

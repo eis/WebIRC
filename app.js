@@ -5,7 +5,7 @@ var app = express.createServer(),
 require('jade');
 
 var settings = require('./settings');
-var IRCServer = require('./ircserver.class');
+var IRCServerConnection = require('./ircserverconnection.class');
 
 // up the log level to not show heartbeat messages
 io.set('log level', 2);
@@ -83,9 +83,9 @@ app.post('/irc', function(req, res){
 
 	if (hasLoginInfo) {
 		var nickName = req.body.user.name;
-		var server = new IRCServer(settings.IRC_SERVER, nickName, settings.IRC_CHANNELS);
-		server.onMessage(messageHandler);
-		server.onDebugMessage(debugMessageHandler);
+		var serverConnection = new IRCServerConnection(settings.IRC_SERVER, nickName, settings.IRC_CHANNELS);
+		serverConnection.onMessage(messageHandler);
+		serverConnection.onDebugMessage(debugMessageHandler);
 		res.render('chat', {
 		     locals: {
 			 	nick: nickName

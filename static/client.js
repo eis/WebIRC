@@ -73,6 +73,14 @@ function doPage()
 			update(msg);
 		}
 	});
+	
+	socket.on('please identify', function() {
+		var sessionID = window.sessionId;
+		mylog('identify request received, responding with ' + sessionID);
+		socket.emit('identify request',
+				{nick: window.nickName, id: sessionID}
+		);
+	});
 }
 
 $(document).ready(function() {
@@ -87,3 +95,9 @@ $(document).ready(function() {
 	}
 
 });
+
+function mylog(msg) {
+	if (window.console && console.log) {
+		console.log(new Date + ': ' + msg);
+	}
+}

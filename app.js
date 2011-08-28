@@ -15,6 +15,13 @@ app.configure(function() {
 	// this is required for BODY request param support
 	// bodyParser() with express 2.x, bodyDecoder() with earlier versions
 	app.use(express.bodyParser());
+
+	// to know which client belongs to which irc connection, we use sessions
+	// cookieparser must be deined before session as per 
+	// http://senchalabs.github.com/connect/middleware-session.html
+	app.use(express.cookieParser());
+	app.use(express.session({ secret: "some value" }));
+	
 	console.log("Socket: configured and ready");
 });
 
@@ -26,18 +33,22 @@ var opts = {
 
 var MyWebIRC = {};
 MyWebIRC.ircMessages = [];
-MyWebIRC.webClients = [];
+MyWebIRC.webClients = {};
 
 function messageHandler(data) {
 
 	for (i in opts.channels) {
 		if (chan == opts.channels[i]) {
 			MyWebIRC.ircMessages.push(data);
+			
+			console.log("Got a message from irc with " + data.clientId);
 
-			if (MyWebIRC.webClients.length != 0) {
-				for (i in MyWebIRC.webClients) {
-					MyWebIRC.webClients[i].client.json.send(data);
-				}
+			if (MyWebIRC.webClients[data.clientId]) {
+				MyWebIRC.webClients[data.clientId].json.send(data);
+				console.log("Data sent to " + data.clientId);
+			} else {
+				console.log("WARN: could not find client connection with id "
+						+ data.clientId + " from " + MyWebIRC.webClients.length + " clients");
 			}
 		}
 	}
@@ -53,10 +64,17 @@ function debugMessageHandler(msg) {
 }
 
 io.sockets.on('connection', function(client) {
-	MyWebIRC.webClients.push({session:client.sessionId,client:client});
-	console.log("got a client :: " + client.sessionId + " :: "+MyWebIRC.webClients.length);
-
-	client.json.send({msgs:MyWebIRC.ircMessages,channels: opts.channels});
+	
+	client.emit('please identify');
+	console.log('Got a client connection, requesting identify');
+	
+	client.on('identify request', function(data) {
+		// client.sessionId undefined at this point so cannot be the key
+		MyWebIRC.webClients[data.id] = client;
+		console.log("got a client identify request :: " + data.id + " :: " + data.nick);
+	
+		client.json.send({msgs:MyWebIRC.ircMessages,channels: opts.channels});
+	});
 
 	client.on('disconnect', function() {
 		for(i in MyWebIRC.webClients) {
@@ -86,9 +104,12 @@ app.post('/irc', function(req, res){
 		var serverConnection = new IRCServerConnection(settings.IRC_SERVER, nickName, settings.IRC_CHANNELS);
 		serverConnection.onMessage(messageHandler);
 		serverConnection.onDebugMessage(debugMessageHandler);
+		serverConnection.setClientConnectionId(req.session.id);
+		console.log("Setting client connection id to " + req.session.id);
 		res.render('chat', {
 		     locals: {
-			 	nick: nickName
+			 	nick: nickName,
+			 	sessionId: req.session.id
 		     }
 		  });
 	} else {

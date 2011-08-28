@@ -6,6 +6,7 @@ var app = express.createServer(),
 require('jade');
 
 var settings = require('./settings');
+io.set('log level', 2);
 
 var opts = {
 	server: settings.IRC_SERVER,

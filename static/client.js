@@ -1,14 +1,14 @@
 var channelList = [];
 
-function update(msg) 
+function update(msg)
 {
 	for(i in channelList) {
 		if(channelList[i] == msg.channel)
 			$("#messages"+i).append("&lt;"+msg.from+"&gt; "+scanMsg(msg.msg)+"<br/>");
-		
+
 		scroll(i);
 	}
-	
+
 }
 
 function updateAll(list)
@@ -24,19 +24,19 @@ function updateAll(list)
 		scroll(i);
 }
 
-function scanMsg(msg) 
+function scanMsg(msg)
 {
 	var regex = /\b(?:(?:https?|ftp|file):\/\/|www\.|ftp\.)[-A-Z0-9+&@#\/%=~_|$?!:,.]*[A-Z0-9+&@#\/%=~_|$]/i;
 
 	return msg.replace(regex," <a href=\"$&\" target=\"_blank\">$&</a> ");
 }
 
-function scroll(i) 
+function scroll(i)
 {
 	$("#messages"+i).scrollTop(9999999);
 }
 
-function createChannels(list) 
+function createChannels(list)
 {
 	str = '<div id="tabs"><ul>';
 
@@ -50,25 +50,28 @@ function createChannels(list)
 		str += '<div id="tabs-'+i+'"><div id="messages'+i+'" class="messages"></div></div>';
 	}
 
+	str += '<div id="input"><input type="text" id="inputelement" /></div>';
+
 	str += '</div>';
 
 	$('#channels').append(str);
 
 	$('#tabs').tabs({selected: 0, show: function() {
-		for(i in channelList) 
+		for(i in channelList)
 			scroll(i);
+        $('#inputelement').focus();
 	}});
 }
 
-function doPage() 
+function doPage()
 {
 	socket = io.connect();
-	
+
 	socket.on('message', function(msg) {
 		mylog('we got a message');
 		if(msg.channels != null) {
 			mylog('with channels');
-			channelList = msg.channels;				
+			channelList = msg.channels;
 			createChannels(msg.channels);
 			updateAll(msg.msgs);
 		} else {
@@ -76,7 +79,7 @@ function doPage()
 			update(msg);
 		}
 	});
-	
+
 	socket.on('please identify', function() {
 		var sessionID = window.sessionId;
 		mylog('identify request received, responding with ' + sessionID);

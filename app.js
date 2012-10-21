@@ -23,11 +23,11 @@ app.configure(function() {
 	app.use(express.bodyParser());
 
 	// to know which client belongs to which irc connection, we use sessions
-	// cookieparser must be defined before session as per 
+	// cookieparser must be defined before session as per
 	// http://senchalabs.github.com/connect/middleware-session.html
 	app.use(express.cookieParser());
 	app.use(express.session({ secret: "some value" }));
-	
+
 	debug("Socket: configured and ready");
 });
 
@@ -40,13 +40,13 @@ app.get('/', function(req, res) {
 	res.render('index');
 });
 
-app.post('/irc', function(req, res){
+app.post('/login', function(req, res){
 
 	if (!req.session || !req.session.id) {
 		res.render('index');
 		return;
 	}
-	
+
 	var hasLoginInfo = (req.body.user !== undefined);
 	var sessionIdString = req.session.id;
 	var nickName = undefined;
@@ -55,16 +55,27 @@ app.post('/irc', function(req, res){
 		nickName = req.body.user.name;
 		WebIRC.newConnection(nickName, sessionIdString);
 		debug("Setting client connection id to " + sessionIdString);
+		res.redirect('/irc');
 	} else {
-		nickName = WebIRC.resolveNickForSession(sessionIdString);
+		res.redirect('/index');
 	}
-	
+
+});
+
+app.get('/irc', function(req, res) {
+	var sessionIdString = req.session.id;
+    if (!sessionIdString) {
+		res.redirect('/index');
+		return;
+    }
+	nickName = WebIRC.resolveNickForSession(sessionIdString);
+
 	res.render('chat', {
 	     locals: {
 		 	nick: nickName,
 		 	sessionId: sessionIdString
 	     }
-	  });
+	});
 });
 
 app.get('/*.*', function(req, res) {

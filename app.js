@@ -78,6 +78,11 @@ app.get('/irc', function(req, res) {
 	});
 });
 
+app.post('/quit', function(req, res) {
+	WebIRC.quit(req.session.id);
+	res.redirect('/');
+});
+
 app.get('/*.*', function(req, res) {
 	res.sendfile("./static" + req.url);
 });

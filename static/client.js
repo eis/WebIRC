@@ -47,6 +47,7 @@ function createChannels(list)
 	}
 
 	str += '</ul>';
+	str += '<form method="post" action="/quit" id="exitform"><input type="submit" value="Quit" /></form>';
 
 	for(i in list) {
 		str += '<div id="tabs-'+i+'"><div id="messages'+i+'" class="messages"></div></div>';

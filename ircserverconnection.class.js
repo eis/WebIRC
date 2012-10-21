@@ -69,6 +69,10 @@ function IRCServerConnection (serverParam, nickParam, channelsParam) {
     	var data = {'channel': channel, 'from': internal.nickName, 'msg': message, 'clientId': internal.clientConnectionId};
     	receiveMessage(data);
 	}
+	
+	this.quit = function(msg) {
+		internal.server.quit(msg);
+	}
 
     this.onMessage = function(handlerFunc) {
     	internal.IRCMessageHandler = handlerFunc;
@@ -84,6 +88,6 @@ function IRCServerConnection (serverParam, nickParam, channelsParam) {
     this.setClientConnectionId = function(idValue) {
     	internal.clientConnectionId = idValue;
     };
-    
+
 }
 module.exports = IRCServerConnection;

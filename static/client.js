@@ -40,7 +40,7 @@ function scroll(i)
 
 function createChannels(list)
 {
-	str = '<div id="tabs"><ul>';
+	str = '<div id="tabs"><div id="tabheader"><ul>';
 
 	for(i in list) {
 		str += '<li><a href="#tabs-'+i+'">'+list[i]+'</a></li>';
@@ -48,6 +48,7 @@ function createChannels(list)
 
 	str += '</ul>';
 	str += '<form method="post" action="/quit" id="exitform"><input type="submit" value="Quit" /></form>';
+	str += '</div>';
 
 	for(i in list) {
 		str += '<div id="tabs-'+i+'"><div id="messages'+i+'" class="messages"></div></div>';

@@ -89,7 +89,9 @@ function WebIRCController(io) {
 	};
 
 	this.quit = function(sessionId) {
-		internal.ircServerConnections[sessionId].quit('Client exit');
+		if (internal.ircServerConnections[sessionId] !== undefined) {
+			internal.ircServerConnections[sessionId].quit('Client exit');
+		}
 	}
 
 	this.newConnection = function(nickName, sessionId) {

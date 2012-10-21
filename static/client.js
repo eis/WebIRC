@@ -1,4 +1,6 @@
 var channelList = [];
+var socket = null;
+var currentChannel = null;
 
 function update(msg)
 {
@@ -56,10 +58,31 @@ function createChannels(list)
 
 	$('#channels').html(str);
 
-	$('#tabs').tabs({selected: 0, show: function() {
-		for(i in channelList)
-			scroll(i);
+	$('#inputelement').keydown(function(event) {
+		if (event.which == 13) {
+			event.preventDefault();
+			var msg = $('#inputelement').val();
+			mylog('should send message ' + msg);
+			if (socket !== null) {
+				socket.emit('msg', {
+					'nick': window.nickName,
+					'id': window.sessionId,
+					'message': msg,
+					'channel': window.currentChannel
+					}
+				);
+			}
+			setTimeout(function() {$('#inputelement').val('')}, 100);
+		}
+	});
+
+	$('#tabs').tabs({selected: 0, show: function(event, ui) {
+		scroll(ui.index);
+        currentChannel = channelList[ui.index];
+        mylog('changed to channel: ' + currentChannel);
+
         $('#inputelement').focus();
+
 	}});
 }
 

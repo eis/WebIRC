@@ -5,24 +5,24 @@ var IRCServerConnection = require('./ircserverconnection.class');
 
 
 function WebIRCController(io) {
-	
+
 	// private
 	var internal = {
 			MAX_MSGS: 1000,
 			ircMessages: [],
 			webClients: {},
-			ircServerConnections: [],
+			ircServerConnections: {},
 			sessionNickMapping: {},
 			debugMessageHandler: function(msg) {}
 	};
-	
+
 	function messageHandler(data) {
 		debug("Got a message from irc with " + data.clientId + " from " + data.channel);
 
 		for (i in settings.IRC_CHANNELS) {
 			if (data.channel == settings.IRC_CHANNELS[i]) {
 				internal.ircMessages.push(data);
-				
+
 
 				if (internal.webClients[data.clientId]) {
 					internal.webClients[data.clientId].json.send(data);
@@ -69,27 +69,38 @@ function WebIRCController(io) {
 			}
 			debug("disconnect");
 		});
+
+		/**
+		 * 	@param data.nick IRC nick used
+		 *	@param data.id session id
+		 *	@param data.message message sent
+		 *	@param data.channel target IRC channel
+		 */
+
+		client.on('msg', function(data) {
+			 internal.ircServerConnections[data.id].sendMessage(data.channel, data.message);
+		});
 	});
-	
+
 	// privileged
-	
+
 	this.onDebugMessage = function(handler) {
 		internal.debugMessageHandler = handler;
 	};
-	
+
 	this.newConnection = function(nickName, sessionId) {
 		var serverConnection = new IRCServerConnection(settings.IRC_SERVER, nickName, settings.IRC_CHANNELS);
 		serverConnection.onMessage(messageHandler);
 		serverConnection.onDebugMessage(internal.debugMessageHandler);
 		serverConnection.setClientConnectionId(sessionId);
-		
-		internal.ircServerConnections.push(serverConnection);
-		
+
+		internal.ircServerConnections[sessionId] = serverConnection;
+
 		internal.sessionNickMapping[sessionId] = nickName;
-		
+
 		return true;
 	};
-	
+
 	this.resolveNickForSession = function(sessionId) {
 		return internal.sessionNickMapping[sessionId];
 	};

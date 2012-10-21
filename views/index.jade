@@ -4,16 +4,16 @@ html(lang="en")
 		title WebIRC
 		<link rel="stylesheet" type="text/css" href="/style.css">
 		<link rel="stylesheet" type="text/css" href="/jquery-ui.css">
-		<script type="text/javascript" src="/jquery.js"></script>
-		<script type="text/javascript" src="/jquery-ui.js"></script>
-		<script type="text/javascript" src="/client.js"></script>
+		script(type='text/javascript', src='/jquery.js')
+		script(type='text/javascript', src='/jquery-ui.js')
+		script(type='text/javascript', src='/client.js')
 	body
 		#container
 			h1 WebIRC
 		form(method="post", action="/login")
 			fieldset
 				label User name:
-				input(type="text", name="user[name]")
+				input(type="text", id="userNameBox", name="user[name]")
 				label Password:
 				input(type="password", name="user[pass]")
 				input(type="submit", value="Login!")

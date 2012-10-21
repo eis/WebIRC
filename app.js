@@ -6,6 +6,7 @@ require('jade');
 
 var WebIRCController = require('./webirccontroller.class');
 var settings = require('./settings');
+var users = require('./users');
 
 var WebIRC = new WebIRCController(io);
 
@@ -40,6 +41,17 @@ app.get('/', function(req, res) {
 	res.render('index');
 });
 
+function userLookup(userName, password)
+{
+	for(index in users) {
+		if ((users[index].username === userName) &&
+			(users[index].password === password)) {
+			return users[index];
+		 }
+	}
+	return null;
+}
+
 app.post('/login', function(req, res){
 
 	if (!req.session || !req.session.id) {
@@ -52,10 +64,15 @@ app.post('/login', function(req, res){
 	var nickName = undefined;
 
 	if (hasLoginInfo) {
-		nickName = req.body.user.name;
-		WebIRC.newConnection(nickName, sessionIdString);
-		debug("Setting client connection id to " + sessionIdString);
-		res.redirect('/irc');
+		var userInfo = userLookup(req.body.user.name, req.body.user.pass);
+		if (userInfo !== null) {
+			nickName = req.body.user.name;
+			WebIRC.newConnection(nickName, sessionIdString);
+			debug("Setting client connection id to " + sessionIdString);
+			res.redirect('/irc');
+		} else {
+			res.redirect('/?invalid_credentials');
+		}
 	} else {
 		res.redirect('/index');
 	}

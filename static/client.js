@@ -115,13 +115,21 @@ function doPage()
 
 $(document).ready(function() {
 	if("WebSocket" in window) {
-		if (window.loggedIn === true) {
+		var areWeWithinIRC = (window.loggedIn === true);
+		if (areWeWithinIRC) {
 			$.getScript('/socket.io/socket.io.js', function() {
 				doPage();
 			});
-		 }
+		} else {
+			$('#userNameBox').focus();
+		}
 	} else {
+		// error page for clients without WebSocket support
 		window.location = "error.html";
+	}
+
+	if (location.search === '?invalid_credentials') {
+		$('#msgbox').html('Invalid credentials!');
 	}
 
 });

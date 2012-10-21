@@ -5,7 +5,7 @@ Interactive version: message sending, multiple connections and very basic authen
 ## General requirements
  -   [Node.js](http://nodejs.org/download/)
  -   npm (node.js packaging manager, usually installed with Node.js)
- -   For web browsers, web socket support is required 
+ -   For web browsers, web socket support is required
 
 ## Dependencies from npm
 All dependencies and their versions are specified in package.json. Installation of dependencies should be done with

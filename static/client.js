@@ -54,7 +54,7 @@ function createChannels(list)
 
 	str += '</div>';
 
-	$('#channels').append(str);
+	$('#channels').html(str);
 
 	$('#tabs').tabs({selected: 0, show: function() {
 		for(i in channelList)

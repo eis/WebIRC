@@ -62,14 +62,14 @@ function IRCServerConnection (serverParam, nickParam, channelsParam) {
     };
 
     this.sendMessage = function(channel, message) {
-		// sending to IRC
-		internal.server.privmsg(channel, message);
+    	// sending to IRC
+    	internal.server.privmsg(channel, message);
 
 		// sending to web client
     	var data = {'channel': channel, 'from': internal.nickName, 'msg': message, 'clientId': internal.clientConnectionId};
     	receiveMessage(data);
 	}
-	
+
 	this.quit = function(msg) {
 		internal.server.quit(msg);
 	}

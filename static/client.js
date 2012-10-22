@@ -40,7 +40,7 @@ function scroll(i)
 
 function createChannels(list)
 {
-	str = '<div id="tabs"><div id="tabheader"><ul>';
+	str = '<div id="tabheader"><ul>';
 
 	for(i in list) {
 		str += '<li><a href="#tabs-'+i+'">'+list[i]+'</a></li>';
@@ -56,9 +56,7 @@ function createChannels(list)
 
 	str += '<div id="input"><input type="text" id="inputelement" /></div>';
 
-	str += '</div>';
-
-	$('#channels').html(str);
+	$('body').html(str);
 
 	$('#inputelement').keydown(function(event) {
 		if (event.which == 13) {
@@ -78,7 +76,7 @@ function createChannels(list)
 		}
 	});
 
-	$('#tabs').tabs({selected: 0, show: function(event, ui) {
+	$('body').tabs({selected: 0, show: function(event, ui) {
 		scroll(ui.index);
         currentChannel = channelList[ui.index];
         mylog('changed to channel: ' + currentChannel);
@@ -122,7 +120,7 @@ $(document).ready(function() {
 				doPage();
 			});
 		} else {
-			$('#userNameBox').focus();
+			$('#input_username').focus();
 		}
 	} else {
 		// error page for clients without WebSocket support
